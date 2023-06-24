@@ -25,7 +25,7 @@ for index, row in data.iterrows():
 
         # Update the word trends dictionary, excluding words containing "relative"
         for word in strategy_words:
-            if 'relative' not in word:
+            if 'RELATIVE' not in word:
                 if word in word_trends:
                     word_trends[word].append(trend)
                 else:
