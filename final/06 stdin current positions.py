@@ -1,21 +1,21 @@
 import sys
 import json
 import pandas as pd
-from utils.url_builder import build_url
+from word_trends_based_on_closed_positions import word_trends_based_on_closed_positions
 
 def scale_score(score, top_words_included, bottom_words_included):
     scaling_factor = 0.5
     word_length_effect = scaling_factor * (len(top_words_included) - len(bottom_words_included))
     return score + max(word_length_effect * score, -score / 1.5)
 
-def calculate_score_for_words(words, all_trends):
+def calculate_score_for_words(words, all_word_trends):
     total_score = 0
     total_trends = 0
     top_words_included = []
     bottom_words_included = []
 
     for word in words:
-        for trend in all_trends:
+        for trend in all_word_trends:
             if word == trend['word']:
                 score = trend['score']
                 total_score += score
@@ -46,14 +46,14 @@ def calculate_score_for_words(words, all_trends):
     }
 
 # Function to calculate the score for a position
-def analyze_position(position, all_trends):
+def analyze_position(position, all_word_trends):
     word_categories = ['activeWords', 'interestingWords', 'initialWords']
     word_analysis = {category: {} for category in word_categories}
 
     for category in word_categories:
         words = position.get(category, [])
         if words:
-            analysis = calculate_score_for_words(words, all_trends)
+            analysis = calculate_score_for_words(words, all_word_trends)
             word_analysis[category] = analysis
 
     # Filter categories that have analysis results
@@ -79,45 +79,15 @@ def analyze_position(position, all_trends):
 
     return word_analysis
 
-# Load the data from the URL
-data = pd.read_json(build_url('/closed-positions'))
+
+all_word_trends = word_trends_based_on_closed_positions()
 
 
-# Remove rows with NaN 'sellReturnPerc' values
-data = data.dropna(subset=['sellReturnPerc'])
+# Get the top 10 and bottom 10 all_word_trends
+top_trends = all_word_trends[:15]
+bottom_trends = all_word_trends[-15:]
 
-# Create a dictionary to store the words and their corresponding trends
-word_trends = {}
 
-# Iterate over each closed position
-for index, row in data.iterrows():
-    avg_sell_price = row['avgSellPrice']
-    buys = row['buys']
-
-    # Iterate over each buy in the buys
-    for buy in buys:
-        fill_price = buy['fillPrice']
-        strategy_words = buy['strategy'].split('-')
-
-        # Calculate the percentage gain (trend) from buy.fillPrice to parent closed position's avgSellPrice
-        trend = ((avg_sell_price - fill_price) / fill_price) * 100
-
-        # Update the word trends dictionary, excluding words containing "relative"
-        for word in strategy_words:
-            if 'RELATIVE' not in word:
-                if word in word_trends:
-                    word_trends[word].append((trend, row['ticker']))
-                else:
-                    word_trends[word] = [(trend, row['ticker'])]
-
-# Filter out words with tickerCount < 4
-word_trends_filtered = {word: trends for word, trends in word_trends.items() if len(set(ticker for _, ticker in trends)) >= 4}
-
-# Calculate the mean trend for each word
-word_mean_trends = {
-    word: sum(trend for trend, _ in trends) / len(trends)
-    for word, trends in word_trends_filtered.items()
-}
 
 # Read the positions JSON from stdin
 positions_json = sys.stdin.read()
@@ -125,31 +95,14 @@ positions_json = sys.stdin.read()
 # Parse the positions JSON
 positions = json.loads(positions_json)
 
-# Get all word_mean_trends with score property
-all_trends = []
-for word, trends in word_trends_filtered.items():
-    trendCount = len(trends)
-    tickerCount = len(set(ticker for _, ticker in trends))
-    avgTrend = sum(trend for trend, _ in trends) / trendCount
-    percUp = sum(1 for trend, _ in trends if trend > 0) / trendCount * 100
-    score = avgTrend * percUp
-    all_trends.append({'word': word, 'avgTrend': avgTrend, 'percUp': percUp, 'trendCount': trendCount, 'tickerCount': tickerCount, 'score': score})
-
-# Sort all_trends by score in descending order
-all_trends = sorted(all_trends, key=lambda x: x['score'], reverse=True)
-
-# Get the top 10 and bottom 10 word_mean_trends
-top_trends = all_trends[:15]
-bottom_trends = all_trends[-15:]
-
 # Calculate and store the scores and topWordsIncluded for each position
 position_analysis = []
 for position in positions:
     ticker = position['ticker']
-    analysis = analyze_position(position, all_trends)
+    analysis = analyze_position(position, all_word_trends)
     position_analysis.append({'ticker': ticker, **dict(analysis)})
 
 # Output the scores and top 10 trends as JSON
-output = {'positionAnalysis': position_analysis, 'topTrends': top_trends, 'bottomTrends': bottom_trends, 'wordCount': len(word_mean_trends)}
+output = {'positionAnalysis': position_analysis, 'topTrends': top_trends, 'bottomTrends': bottom_trends, 'wordCount': len(all_word_trends)}
 output_json = json.dumps(output)
 print(output_json)
