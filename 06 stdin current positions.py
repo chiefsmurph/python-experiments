@@ -2,11 +2,17 @@ import sys
 import json
 import pandas as pd
 
+def scale_score(score, top_words_included, bottom_words_included):
+    scaling_factor = 0.5
+    word_length_effect = scaling_factor * (len(top_words_included) - len(bottom_words_included))
+    return score + max(word_length_effect * score, -score / 1.5)
+
 # Function to calculate the score for a position
 def calculate_score(position, all_trends):
     ticker = position['ticker']
     active_words = position['activeWords']
     total_score = 0
+    total_trends = 0
     top_words_included = []
     bottom_words_included = []
 
@@ -15,17 +21,24 @@ def calculate_score(position, all_trends):
             if word == trend['word']:
                 score = trend['score']
                 total_score += score
+                total_trends += 1
                 if trend in top_trends:
                     top_words_included.append(word)
                 elif trend in bottom_trends:
                     bottom_words_included.append(word)
 
-    scaling_factor = 0.5  # Adjust the scaling factor as desired (0.0 to 1.0)
-    word_length_effect = scaling_factor * (len(top_words_included) - len(bottom_words_included)) * total_score
-    max_effect = -total_score / 1.5
-    scaled_score = total_score + max(word_length_effect, max_effect)
+    # Calculate avg and scaled scores
+    avg_score = total_score / total_trends
+    scaled_total_score = scale_score(total_score, top_words_included, bottom_words_included)
+    scaled_avg_score = scale_score(avg_score, top_words_included, bottom_words_included)
 
-    return total_score, scaled_score, top_words_included, bottom_words_included
+    # Round them all
+    avg_score = round(avg_score)
+    scaled_avg_score = round(scaled_avg_score)
+    total_score = round(total_score)
+    scaled_total_score = round(scaled_total_score)
+
+    return avg_score, scaled_avg_score, total_score, scaled_total_score, top_words_included, bottom_words_included
 
 # Load the data from the URL
 data_url = 'http://38.108.119.159:3000/closed-positions'
@@ -94,8 +107,8 @@ bottom_trends = all_trends[-15:]
 positionScores = []
 for position in positions:
     ticker = position['ticker']
-    total_score, scaled_score, top_words_included, bottom_words_included = calculate_score(position, all_trends)
-    positionScores.append({'ticker': ticker, 'originalScore': total_score, 'scaledScore': scaled_score, 'topWordsIncluded': top_words_included, 'bottomWordsIncluded': bottom_words_included})
+    avg_score, scaled_avg_score, total_score, scaled_total_score, top_words_included, bottom_words_included = calculate_score(position, all_trends)
+    positionScores.append({'ticker': ticker, 'avgScore': avg_score, 'totalScore': total_score, 'scaledAvgScore': scaled_avg_score, 'scaledTotalScore': scaled_total_score, 'topWordsIncluded': top_words_included, 'bottomWordsIncluded': bottom_words_included})
 
 # Output the scores and top 10 trends as JSON
 output = {'positionScores': positionScores, 'topTrends': top_trends, 'bottomTrends': bottom_trends, 'wordCount': len(word_mean_trends)}
