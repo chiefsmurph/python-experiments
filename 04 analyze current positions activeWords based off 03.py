@@ -1,8 +1,7 @@
 import pandas as pd
+from utils.url_builder import build_url
 
-# Load the data from the URL
-data_url = 'http://38.108.119.159:3000/closed-positions'
-data = pd.read_json(data_url)
+data = pd.read_json(build_url('/closed-positions'))
 
 # Remove rows with NaN 'sellReturnPerc' values
 data = data.dropna(subset=['sellReturnPerc'])
@@ -53,7 +52,7 @@ def calculate_score(position):
     return total_score
 
 # Example usage
-data_url = 'http://38.108.119.159:3000/cur-p'
+data_url = endpoint + '/cur-p'
 positions = pd.read_json(data_url)
 
 print(positions)

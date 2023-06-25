@@ -1,13 +1,14 @@
 import pandas as pd
 import numpy as np
 from datetime import datetime
+from utils.url_builder import build_url
 
+# Example usage
 def remove_outliers(trends, threshold=40):
     return [t for t in trends if abs(t) <= threshold]
 
 # Load the data from the URL
-data_url = 'http://38.108.119.159:3000/ticker-recs'
-firstdata = pd.read_json(data_url)
+firstdata = pd.read_json(build_url('/ticker-recs'))
 
 # Remove rows with NaN 'pickPriceToOpeningPriceNextDay' values
 data = firstdata.dropna(subset=['pickPriceToOpeningPriceNextDay'])
@@ -44,7 +45,7 @@ sorted_words = sorted(word_scores, key=lambda x: x[4], reverse=True)
 
 # Print the words, mean trend, percentage of positive trends, trend count, and score
 for word, mean_trend, percent_positive, trend_count, score in sorted_words:
-    print(f'Word: {word}, Mean Trend: {round(mean_trend, 0)}, Percentage of Positive Trends: {round(percent_positive, 0)}%, Trend Count: {trend_count}, Score: {score}')
+    print(f'Word: {word}, Mean Trend: {round(mean_trend, 2)}, Percentage of Positive Trends: {round(percent_positive)}%, Trend Count: {trend_count}, Score: {score}')
 print('-' * 50)
 
 # Get the ten most recent rows
@@ -55,11 +56,15 @@ for index, entry in recent_rows.iterrows():
     timestamp = entry['timestamp'].strftime('%Y-%m-%d %H:%M:%S')
     ticker = entry['ticker']
     active_words = entry['activeWords']
+    finalZScoreSum = entry['finalZScoreSum']
+    myScoreBasedOnWords = entry['myScoreBasedOnWords']
 
     # Print the timestamp, ticker, and activeWords
     print(f'Timestamp: {timestamp}')
     print(f'Ticker: {ticker}')
     print(f'Active Words: {active_words}')
+    print(f'finalZScoreSum: {finalZScoreSum}')
+    print(f'myScoreBasedOnWords: {myScoreBasedOnWords}')
 
     # Calculate the overall score for the recent ticker recommendation based on activeWords scores
     overall_score = 0

@@ -1,12 +1,16 @@
 import pandas as pd
+import os
+
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 import requests
 import numpy as np
 
+from utils.url_builder import build_url
+
 # Load the data from the URL
-url = 'http://38.108.119.159:3000/closed-positions'
+url = build_url('/closed-positions')
 data = requests.get(url).json()
 
 # Convert the JSON data into a DataFrame

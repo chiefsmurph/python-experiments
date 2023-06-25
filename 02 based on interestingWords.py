@@ -4,9 +4,10 @@ from sklearn.model_selection import train_test_split
 from scipy.stats import pearsonr
 import numpy as np
 
+from utils.url_builder import build_url
+
 # Load the data from the URL
-data_url = 'http://38.108.119.159:3000/closed-positions'
-data = pd.read_json(data_url)
+data = pd.read_json(build_url('/closed-positions'))
 
 # Remove rows with NaN 'sellReturnPerc' values
 data = data.dropna(subset=['sellReturnPerc'])

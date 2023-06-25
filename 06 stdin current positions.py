@@ -1,6 +1,7 @@
 import sys
 import json
 import pandas as pd
+from utils.url_builder import build_url
 
 def scale_score(score, top_words_included, bottom_words_included):
     scaling_factor = 0.5
@@ -79,8 +80,8 @@ def analyze_position(position, all_trends):
     return word_analysis
 
 # Load the data from the URL
-data_url = 'http://38.108.119.159:3000/closed-positions'
-data = pd.read_json(data_url)
+data = pd.read_json(build_url('/closed-positions'))
+
 
 # Remove rows with NaN 'sellReturnPerc' values
 data = data.dropna(subset=['sellReturnPerc'])

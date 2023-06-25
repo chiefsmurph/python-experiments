@@ -1,14 +1,15 @@
 import sys
 import json
 import pandas as pd
+from utils.url_builder import build_url
 
 # Function to calculate the score for a position
 def calculate_score(position):
     active_words = position['activeWords']
 
     # Load the data from the URL
-    data_url = 'http://38.108.119.159:3000/closed-positions'
-    data = pd.read_json(data_url)
+    data = pd.read_json(build_url('/closed-positions'))
+
 
     # Remove rows with NaN 'sellReturnPerc' values
     data = data.dropna(subset=['sellReturnPerc'])
