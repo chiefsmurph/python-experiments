@@ -59,8 +59,8 @@ def analyze_position(position, all_trends):
     valid_categories = [category for category, analysis in word_analysis.items() if analysis]
 
     # Calculate overall average and unique concatenation for valid categories
-    overall_avg_score = sum(word_analysis[category]['avgScore'] for category in valid_categories) / len(valid_categories)
-    overall_scaled_avg_score = sum(word_analysis[category]['scaledAvgScore'] for category in valid_categories) / len(valid_categories)
+    overall_avg_score = round(sum(word_analysis[category]['avgScore'] for category in valid_categories) / len(valid_categories))
+    overall_scaled_avg_score = round(sum(word_analysis[category]['scaledAvgScore'] for category in valid_categories) / len(valid_categories))
     overall_total_score = sum(word_analysis[category]['totalScore'] for category in valid_categories)
     overall_scaled_total_score = sum(word_analysis[category]['scaledTotalScore'] for category in valid_categories)
     overall_top_words_included = list(set(word for category in valid_categories for word in word_analysis[category]['topWordsIncluded']))
