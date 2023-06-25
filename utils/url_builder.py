@@ -7,5 +7,4 @@ api_qs = os.environ.get("api-qs")
 
 def build_url(path):
     url = api_host + path + '?' + api_qs
-    print('url: ' + url)
     return url
