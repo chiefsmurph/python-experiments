@@ -8,7 +8,7 @@ def remove_outliers(trends, threshold=40):
     return [t for t in trends if abs(t) <= threshold]
 
 # Load the data from the URL
-firstdata = pd.read_json(build_url('/ticker-recs?onlyShouldBuys'))
+firstdata = pd.read_json(build_url('/ticker-recs'))
 
 # Remove rows with NaN 'pickPriceToOpeningPriceNextDay' values
 data = firstdata.dropna(subset=['pickPriceToOpeningPriceNextDay'])
@@ -44,8 +44,9 @@ for word, trends in word_trends.items():
 sorted_words = sorted(word_scores, key=lambda x: x[4], reverse=True)
 
 # Print the words, mean trend, percentage of positive trends, trend count, and score
-for word, mean_trend, percent_positive, trend_count, score in sorted_words:
-    print(f'Word: {word}, Mean Trend: {round(mean_trend, 2)}, Percentage of Positive Trends: {round(percent_positive)}%, Trend Count: {trend_count}, Score: {score}')
+for index, (word, mean_trend, percent_positive, trend_count, score) in enumerate(sorted_words):
+    print(f'Index: {index}, Word: {word}, Mean Trend: {round(mean_trend, 2)}, Percentage of Positive Trends: {round(percent_positive)}%, Trend Count: {trend_count}, Score: {score}')
+    
 print('-' * 50)
 
 # Get the ten most recent rows

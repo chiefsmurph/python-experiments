@@ -86,7 +86,7 @@ stdin_payload = sys.stdin.read()
 # Parse the positions JSON
 input_json = json.loads(stdin_payload)
 positions = input_json['positions']
-closed_positions = input_json['closed_positions']
+closed_positions = input_json['closedPositions']
 
 
 all_word_trends = word_trends_based_on_closed_positions(closed_positions)
