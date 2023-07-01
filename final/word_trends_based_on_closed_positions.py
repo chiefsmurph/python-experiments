@@ -10,8 +10,11 @@ sys.path.append('python-experiments/utils')  # Add the parent directory to the P
 from url_builder import build_url
 
 def word_trends_based_on_closed_positions(closed_positions):
-    
-    # Remove rows with NaN 'sellReturnPerc' values
+        
+    # Convert closed_positions list to DataFrame
+    closed_positions = pd.DataFrame(closed_positions)
+
+    # Drop rows with missing values in the 'sellReturnPerc' column
     closed_positions = closed_positions.dropna(subset=['sellReturnPerc'])
 
     # Create a dictionary to store the words and their corresponding trends
