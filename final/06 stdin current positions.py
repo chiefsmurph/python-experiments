@@ -89,7 +89,7 @@ positions = input_json['positions']
 closed_positions = input_json['closed_positions']
 
 
-all_word_trends = word_trends_based_on_closed_positions()
+all_word_trends = word_trends_based_on_closed_positions(closed_positions)
 
 # Get the top 10 and bottom 10 all_word_trends
 top_trends = all_word_trends[:15]
