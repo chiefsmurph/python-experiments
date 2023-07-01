@@ -61,12 +61,12 @@ sorted_words = sorted(word_scores, key=lambda x: x[4], reverse=True)
 # print('-' * 50)
 
 
-def scoreWords(words):
+def scoreWords(active_words):
     overall_score = 0
     for word, mean_trend, percent_positive, trend_count, score in sorted_words:
         if word in active_words:
             overall_score += score
-    return overall_score
+    return round(overall_score, 2)
 
 # Analyze the performance based on the sorted_words for the words in activeWords in recent_rows
 for entry in current_ticker_recs:
