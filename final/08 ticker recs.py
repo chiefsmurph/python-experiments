@@ -69,7 +69,7 @@ def scoreWords(words):
     return overall_score
 
 # Analyze the performance based on the sorted_words for the words in activeWords in recent_rows
-for index, entry in current_ticker_recs:
+for entry in current_ticker_recs:
     entry['pythonScore'] = scoreWords(entry['activeWords'])
 
 output_json = json.dumps(current_ticker_recs)
