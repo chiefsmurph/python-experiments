@@ -8,7 +8,7 @@ def remove_outliers(trends, threshold=40):
     return [t for t in trends if abs(t) <= threshold]
 
 # Load the data from the URL
-firstdata = pd.read_json(build_url('/ticker-recs'))
+firstdata = pd.read_json(build_url('/ticker-recs?onlyShouldBuys'))
 
 # Remove rows with NaN 'pickPriceToOpeningPriceNextDay' values
 data = firstdata.dropna(subset=['pickPriceToOpeningPriceNextDay'])

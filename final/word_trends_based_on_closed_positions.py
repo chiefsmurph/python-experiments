@@ -9,19 +9,16 @@ sys.path.append('python-experiments/utils')  # Add the parent directory to the P
 
 from url_builder import build_url
 
-def word_trends_based_on_closed_positions():
-
-    # Load the data from the URL
-    data = pd.read_json(build_url('/closed-positions'))
-
+def word_trends_based_on_closed_positions(closed_positions):
+    
     # Remove rows with NaN 'sellReturnPerc' values
-    data = data.dropna(subset=['sellReturnPerc'])
+    closed_positions = closed_positions.dropna(subset=['sellReturnPerc'])
 
     # Create a dictionary to store the words and their corresponding trends
     word_trends = {}
 
     # Iterate over each closed position
-    for index, row in data.iterrows():
+    for index, row in closed_positions.iterrows():
         avg_sell_price = row['avgSellPrice']
         buys = row['buys']
 

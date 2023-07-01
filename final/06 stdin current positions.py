@@ -80,20 +80,21 @@ def analyze_position(position, all_word_trends):
     return word_analysis
 
 
-all_word_trends = word_trends_based_on_closed_positions()
 
+stdin_payload = sys.stdin.read()
+
+# Parse the positions JSON
+input_json = json.loads(stdin_payload)
+positions = input_json['positions']
+closed_positions = input_json['closed_positions']
+
+
+all_word_trends = word_trends_based_on_closed_positions()
 
 # Get the top 10 and bottom 10 all_word_trends
 top_trends = all_word_trends[:15]
 bottom_trends = all_word_trends[-15:]
 
-
-
-# Read the positions JSON from stdin
-positions_json = sys.stdin.read()
-
-# Parse the positions JSON
-positions = json.loads(positions_json)
 
 # Calculate and store the scores and topWordsIncluded for each position
 position_analysis = []
