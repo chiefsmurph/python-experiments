@@ -1,7 +1,9 @@
+import sys
+import json
 import pandas as pd
 import numpy as np
 from datetime import datetime
-from utils.url_builder import build_url
+# from utils.url_builder import build_url
 
 # Example usage
 def remove_outliers(trends, threshold=40):
@@ -67,7 +69,7 @@ def scoreWords(words):
     return overall_score
 
 # Analyze the performance based on the sorted_words for the words in activeWords in recent_rows
-for index, entry in current_ticker_recs.iterrows():
+for index, entry in current_ticker_recs:
     entry['pythonScore'] = scoreWords(entry['activeWords'])
 
 output_json = json.dumps(current_ticker_recs)
