@@ -35,7 +35,7 @@ def word_trends_based_on_closed_positions(closed_positions):
 
             # Update the word trends dictionary, excluding words containing "relative"
             for word in strategy_words:
-                if 'RELATIVE' not in word:
+                # if 'RELATIVE' not in word:
                     if word in word_trends:
                         word_trends[word].append((trend, row['ticker']))
                     else:

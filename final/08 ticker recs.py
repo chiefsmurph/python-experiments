@@ -34,7 +34,7 @@ for index, entry in all_ticker_recs.iterrows():
 
     # Update the word trends dictionary, excluding words containing "relative" and filtering trends
     for word in active_words:
-        if 'RELATIVE' not in word:
+        # if 'RELATIVE' not in word:
             if abs(trend) < 40:
                 if word in word_trends:
                     word_trends[word].append(trend)
