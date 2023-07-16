@@ -17,7 +17,7 @@ def calculate_score_for_words(words, all_word_trends):
     for word in words:
         for trend in all_word_trends:
             if word == trend['word']:
-                score = trend['score']
+                score = trend['scoreIndex']
                 total_score += score
                 total_trends += 1
                 if trend in top_trends:
@@ -104,6 +104,6 @@ for position in positions:
     position_analysis.append({'ticker': ticker, **dict(analysis)})
 
 # Output the scores and top 10 trends as JSON
-output = {'positionAnalysis': position_analysis, 'topTrends': top_trends, 'bottomTrends': bottom_trends, 'wordCount': len(all_word_trends)}
+output = {'positionAnalysis': position_analysis, 'topTrends': top_trends, 'bottomTrends': bottom_trends, 'wordCount': len(all_word_trends), 'allWordTrends': all_word_trends}
 output_json = json.dumps(output)
 print(output_json)
