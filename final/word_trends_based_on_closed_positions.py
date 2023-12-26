@@ -14,8 +14,9 @@ def word_trends_based_on_closed_positions(closed_positions):
     # Convert closed_positions list to DataFrame
     closed_positions = pd.DataFrame(closed_positions)
 
-    # Drop rows with missing values in the 'sellReturnPerc' column
-    closed_positions = closed_positions.dropna(subset=['sellReturnPerc'])
+    if 'sellReturnPerc' in closed_positions.columns:
+        # Drop rows with missing values in the 'sellReturnPerc' column
+        closed_positions = closed_positions.dropna(subset=['sellReturnPerc'])
 
     # Create a dictionary to store the words and their corresponding trends
     word_trends = {}
