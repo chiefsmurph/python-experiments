@@ -57,7 +57,7 @@ def word_trends_based_on_closed_positions(closed_positions):
     # Sort all_trends by score in descending order
     all_trends = sorted(all_trends, key=lambda x: x['score'], reverse=True)
 
-    scaling_factor = 100 / (len(all_trends) - 1)
+    scaling_factor = 100 / (len(all_trends) - 1) if len(all_trends) > 1 else 1
 
     # Add the scoreIndex to each trend
     for index, trend in enumerate(all_trends):
