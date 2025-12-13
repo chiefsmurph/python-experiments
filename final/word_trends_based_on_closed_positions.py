@@ -7,7 +7,7 @@ import sys
 import sys
 sys.path.append('python-experiments/utils')  # Add the parent directory to the Python path
 
-from url_builder import build_url
+from .url_builder import build_url
 
 def word_trends_based_on_closed_positions(closed_positions):
         

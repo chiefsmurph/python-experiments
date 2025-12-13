@@ -1,7 +1,7 @@
 import sys
 import json
 import pandas as pd
-from word_trends_based_on_closed_positions import word_trends_based_on_closed_positions
+from .word_trends_based_on_closed_positions import word_trends_based_on_closed_positions
 
 def scale_score(score, top_words_included, bottom_words_included):
     scaling_factor = 0.5
