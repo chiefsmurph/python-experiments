@@ -18,10 +18,15 @@ current_ticker_recs = input_json['currentTickerRecs']
 all_ticker_recs = input_json['allTickerRecs']
 
 
-# Convert closed_positions list to DataFrame
 all_ticker_recs = pd.DataFrame(all_ticker_recs)
 
-# Remove rows with NaN 'pickPriceToOpeningPriceNextDay' values
+if 'pickPriceToOpeningPriceNextDay' not in all_ticker_recs.columns:
+    # No history yet -> just set pythonScore = 0 and return
+    for entry in current_ticker_recs:
+        entry['pythonScore'] = 0
+    print(json.dumps(current_ticker_recs))
+    sys.exit(0)
+
 all_ticker_recs = all_ticker_recs.dropna(subset=['pickPriceToOpeningPriceNextDay'])
 
 # Create a dictionary to store the words and their corresponding trends
