@@ -66,12 +66,18 @@ sorted_words = sorted(word_scores, key=lambda x: x[4], reverse=True)
 # print('-' * 50)
 
 
+# De-biased word score: AVERAGE the matched words' expectancies instead of SUMMING them.
+# Summing rewarded word-count, not word-quality, which made pythonScore inverted out-of-sample
+# (high score -> worse next-day returns). We rescale by a fixed reference count so the numeric
+# scale stays comparable to the old sum (keeping minPythonScore / super-inflation thresholds valid);
+# pythonScoreZScore is scale-invariant and just sees the corrected ranks.
+REFERENCE_WORD_COUNT = 28  # ~= historical avg words/rec; keeps scale, removes the count bias
+
 def scoreWords(active_words):
-    overall_score = 0
-    for word, mean_trend, percent_positive, trend_count, score in sorted_words:
-        if word in active_words:
-            overall_score += score
-    return round(overall_score, 2)
+    matched = [score for word, mean_trend, percent_positive, trend_count, score in sorted_words if word in active_words]
+    if not matched:
+        return 0
+    return round((sum(matched) / len(matched)) * REFERENCE_WORD_COUNT, 2)
 
 # Analyze the performance based on the sorted_words for the words in activeWords in recent_rows
 for entry in current_ticker_recs:
