@@ -86,10 +86,20 @@ stdin_payload = sys.stdin.read()
 # Parse the positions JSON
 input_json = json.loads(stdin_payload)
 positions = input_json['positions']
-closed_positions = input_json['closedPositions']
+closed_positions = input_json.get('closedPositions') or []
 
-
-all_word_trends = word_trends_based_on_closed_positions(closed_positions)
+# all_word_trends is a PURE FUNCTION of closed_positions, and closed_positions cannot change
+# within one refreshPositions cycle — yet the node caller invokes this script three times per
+# cycle (addWordAnalysis runs 3x, with different activeWords each pass). Recomputing identical
+# trends three times, and shipping the ~18MB closed payload to do it, was the bulk of the cycle
+# cost. When the caller has already cached the trends it passes them in, so both the recompute
+# and the payload disappear. Absent the key we compute exactly as before, so any caller that
+# doesn't know about it is unaffected.
+provided_trends = input_json.get('allWordTrends')
+if provided_trends is not None:
+    all_word_trends = provided_trends
+else:
+    all_word_trends = word_trends_based_on_closed_positions(closed_positions)
 
 # Get the top 10 and bottom 10 all_word_trends
 top_trends = all_word_trends[:15]
@@ -104,6 +114,11 @@ for position in positions:
     position_analysis.append({'ticker': ticker, **dict(analysis)})
 
 # Output the scores and top 10 trends as JSON
-output = {'positionAnalysis': position_analysis, 'topTrends': top_trends, 'bottomTrends': bottom_trends, 'wordCount': len(all_word_trends), 'allWordTrends': all_word_trends}
+output = {'positionAnalysis': position_analysis, 'topTrends': top_trends, 'bottomTrends': bottom_trends, 'wordCount': len(all_word_trends)}
+# Echoing the full trends back costs another large serialize here plus a JSON.parse on the node
+# side, for a value the caller only needs when it is populating its cache. Defaults to True so
+# existing callers keep the original output shape.
+if input_json.get('includeTrendsInOutput', True):
+    output['allWordTrends'] = all_word_trends
 output_json = json.dumps(output)
 print(output_json)
